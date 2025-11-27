@@ -144,8 +144,8 @@ class StudyGuideApp {
             <span>${topic.title}</span>
         `;
 
-        topicDiv.addEventListener('click', () => {
-            this.loadTopic(sectionId, topic);
+        topicDiv.addEventListener('click', (e) => {
+            this.loadTopic(sectionId, topic, e);
         });
 
         return topicDiv;
@@ -216,7 +216,7 @@ class StudyGuideApp {
     }
 
     // Load Topic Content
-    loadTopic(sectionId, topic) {
+    loadTopic(sectionId, topic, event) {
         this.currentSection = sectionId;
         this.currentTopic = topic.title;
 
@@ -234,7 +234,9 @@ class StudyGuideApp {
 
         // Update active state in sidebar
         document.querySelectorAll('.topic-item').forEach(el => el.classList.remove('active'));
-        event.target.closest('.topic-item').classList.add('active');
+        if (event) {
+            event.target.closest('.topic-item').classList.add('active');
+        }
 
         // Show topic footer
         const footer = document.getElementById('topic-footer');
@@ -273,9 +275,45 @@ class StudyGuideApp {
     }
 
     updateSidebarProgress() {
-        // Re-render sidebar with updated progress
-        document.getElementById('section-nav').innerHTML = '';
-        this.renderSidebar();
+        // Update topic checkmarks and section progress counts
+        Object.keys(this.sectionData).forEach((sectionId, index) => {
+            const topics = this.sectionData[sectionId].topics;
+            const progress = this.getSectionProgress(sectionId, topics);
+
+            // Update section progress text
+            const sectionHeaders = document.querySelectorAll('.section-header');
+            const sectionHeader = sectionHeaders[index];
+            if (sectionHeader) {
+                const progressSpan = sectionHeader.querySelector('.section-progress');
+                if (progressSpan) {
+                    progressSpan.textContent = `${progress.completed}/${progress.total}`;
+                }
+
+                // Update completed class on section
+                if (progress.completed === progress.total && progress.total > 0) {
+                    sectionHeader.classList.add('completed');
+                } else {
+                    sectionHeader.classList.remove('completed');
+                }
+            }
+
+            // Update topic checkmarks
+            topics.forEach(topic => {
+                const topicKey = this.getTopicKey(sectionId, topic.title);
+                const isCompleted = this.progress[topicKey] || false;
+
+                document.querySelectorAll('.topic-item').forEach(topicEl => {
+                    const topicText = topicEl.querySelector('span').textContent;
+                    if (topicText === topic.title) {
+                        if (isCompleted) {
+                            topicEl.classList.add('completed');
+                        } else {
+                            topicEl.classList.remove('completed');
+                        }
+                    }
+                });
+            });
+        });
     }
 
     updateProgressDashboard() {
