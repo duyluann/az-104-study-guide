@@ -1,5 +1,59 @@
 # AZ-104: Microsoft Azure Administrator Study Guide
 
+## Interactive Study Web App
+
+This repository includes an interactive web application that makes studying easier with progress tracking, notes, and a modern interface.
+
+### Features
+
+- **Progress Tracking**: Mark sections and topics as completed
+- **Topic-Level Progress**: Track individual topics within each section
+- **Progress Dashboard**: Visual dashboard showing completion percentage and statistics
+- **Study Notes**: Add and save personal notes for each topic
+- **Modern Interface**: Clean, responsive design that works on all devices
+- **Local Storage**: All progress and notes are saved automatically in your browser
+
+### Quick Start
+
+#### Option 1: GitHub Pages (Recommended)
+The app is deployed at: `https://YOUR-USERNAME.github.io/az-104-study-guide/`
+
+To enable GitHub Pages:
+1. Go to your repository Settings
+2. Navigate to Pages section
+3. Under "Build and deployment", select "Deploy from a branch"
+4. Select the `main` branch and `/ (root)` folder
+5. Click Save
+6. Your site will be available in a few minutes
+
+#### Option 2: Run Locally
+```bash
+# Clone the repository
+git clone https://github.com/YOUR-USERNAME/az-104-study-guide.git
+cd az-104-study-guide
+
+# Start a local web server (Python 3)
+python3 -m http.server 8000
+
+# Or using Python 2
+python -m SimpleHTTPServer 8000
+
+# Or using Node.js
+npx http-server
+
+# Open your browser to http://localhost:8000
+```
+
+### How to Use the Study App
+
+1. **Navigate Sections**: Click on any of the 5 sections in the sidebar to expand topics
+2. **Study Topics**: Click on individual topics to view the content
+3. **Mark Complete**: Use the checkbox at the bottom to mark topics as completed
+4. **Add Notes**: Click the notes icon to open the notes panel and add personal notes
+5. **Track Progress**: Monitor your overall progress in the circular progress indicator
+
+---
+
 ## About the AZ-104 Exam
 
 The **AZ-104: Microsoft Azure Administrator** certification validates your skills in implementing, managing, and monitoring an organization's Azure environment. This intermediate-level certification is ideal for professionals who want to demonstrate their expertise in Azure administration.
