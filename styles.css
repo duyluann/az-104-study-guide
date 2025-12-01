@@ -708,13 +708,13 @@ body {
 .checkbox-label {
     display: flex;
     align-items: center;
-    gap: 0.875rem;
+    gap: 0.625rem;
     cursor: pointer;
     font-weight: 500;
-    font-size: 0.95rem;
+    font-size: 0.875rem;
     color: var(--text-primary);
-    padding: 0.75rem 1rem;
-    border-radius: var(--radius-md);
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-sm);
     transition: all 0.2s ease;
 }
 
@@ -723,11 +723,11 @@ body {
 }
 
 .checkbox-label input[type="checkbox"] {
-    width: 22px;
-    height: 22px;
+    width: 16px;
+    height: 16px;
     cursor: pointer;
     accent-color: var(--primary-color);
-    border-radius: 4px;
+    border-radius: 3px;
 }
 
 /* Scrollbar Styling */
