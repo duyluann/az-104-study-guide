@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AZ-104 Debug Console</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #00ff00;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #2a2a2a;
+            border-left: 3px solid #00ff00;
+        }
+        .error { color: #ff4444; }
+        .success { color: #00ff00; }
+        .info { color: #4da6ff; }
+        button {
+            background: #00ff00;
+            color: #1a1a1a;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            font-family: monospace;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #00cc00;
+        }
+        #console {
+            margin-top: 20px;
+            padding: 15px;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            padding: 5px 0;
+            border-bottom: 1px solid #222;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 AZ-104 Study Guide - Debug Console</h1>
+
+    <div class="test-section">
+        <h2>Functionality Tests</h2>
+        <button onclick="testMarkdownLoading()">1. Test Markdown Loading</button>
+        <button onclick="testTopicExtraction()">2. Test Topic Extraction</button>
+        <button onclick="testLocalStorage()">3. Test Local Storage</button>
+        <button onclick="testProgressTracking()">4. Test Progress Tracking</button>
+        <button onclick="testMarkedLibrary()">5. Test Marked.js Library</button>
+        <button onclick="clearConsole()">Clear Console</button>
+    </div>
+
+    <div id="console">
+        <div class="log-entry info">Debug console ready. Click buttons above to run tests.</div>
+    </div>
+
+    <script>
+        const consoleDiv = document.getElementById('console');
+
+        function log(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            consoleDiv.appendChild(entry);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+
+        function clearConsole() {
+            consoleDiv.innerHTML = '<div class="log-entry info">Console cleared.</div>';
+        }
+
+        async function testMarkdownLoading() {
+            log('Testing markdown file loading...', 'info');
+
+            const files = [
+                '01_Azure_Identities_and_Governance.md',
+                '02_Implement_and_Manage_Storage.md',
+                '03_Deploy_and_Manage_Compute_Resources.md',
+                '04_Implement_and_Manage_Virtual_Networking.md',
+                '05_Monitor_and_Maintain_Azure_Resources.md'
+            ];
+
+            for (const file of files) {
+                try {
+                    const response = await fetch(file);
+                    if (response.ok) {
+                        const content = await response.text();
+                        log(`✓ ${file} loaded (${content.length} chars)`, 'success');
+                    } else {
+                        log(`✗ ${file} failed: ${response.status}`, 'error');
+                    }
+                } catch (error) {
+                    log(`✗ ${file} error: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        async function testTopicExtraction() {
+            log('Testing topic extraction logic...', 'info');
+
+            try {
+                const response = await fetch('01_Azure_Identities_and_Governance.md');
+                const markdown = await response.text();
+
+                const topics = extractTopics(markdown);
+                log(`✓ Extracted ${topics.length} topics`, 'success');
+
+                topics.slice(0, 5).forEach((topic, i) => {
+                    const subtitle = topic.subtitle ? ` > ${topic.subtitle}` : '';
+                    log(`  ${i + 1}. ${topic.title}${subtitle}`, 'info');
+                });
+
+                if (topics.length > 5) {
+                    log(`  ... and ${topics.length - 5} more topics`, 'info');
+                }
+            } catch (error) {
+                log(`✗ Topic extraction failed: ${error.message}`, 'error');
+            }
+        }
+
+        function extractTopics(markdown) {
+            const topics = [];
+            const lines = markdown.split('\n');
+            let currentH2 = null;
+            let currentH3 = null;
+            let content = [];
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+
+                if (line.startsWith('## ') && !line.includes('Overview')) {
+                    if (currentH2) {
+                        topics.push({
+                            title: currentH2,
+                            subtitle: currentH3,
+                            content: content.join('\n')
+                        });
+                    }
+                    currentH2 = line.replace('## ', '').trim();
+                    currentH3 = null;
+                    content = [line];
+                } else if (line.startsWith('### ')) {
+                    if (currentH2 && currentH3) {
+                        topics.push({
+                            title: currentH2,
+                            subtitle: currentH3,
+                            content: content.join('\n')
+                        });
+                        content = [];
+                    }
+                    currentH3 = line.replace('### ', '').trim();
+                    content.push(line);
+                } else {
+                    content.push(line);
+                }
+            }
+
+            if (currentH2) {
+                topics.push({
+                    title: currentH2,
+                    subtitle: currentH3,
+                    content: content.join('\n')
+                });
+            }
+
+            return topics;
+        }
+
+        function testLocalStorage() {
+            log('Testing local storage...', 'info');
+
+            try {
+                // Test write
+                const testData = { test: 'data', timestamp: Date.now() };
+                localStorage.setItem('az104-test', JSON.stringify(testData));
+                log('✓ Write to localStorage successful', 'success');
+
+                // Test read
+                const retrieved = JSON.parse(localStorage.getItem('az104-test'));
+                if (retrieved && retrieved.test === 'data') {
+                    log('✓ Read from localStorage successful', 'success');
+                } else {
+                    log('✗ Read returned unexpected data', 'error');
+                }
+
+                // Check existing data
+                const progress = localStorage.getItem('az104-progress');
+                const notes = localStorage.getItem('az104-notes');
+
+                if (progress) {
+                    const progressData = JSON.parse(progress);
+                    const count = Object.keys(progressData).length;
+                    log(`✓ Found ${count} saved progress items`, 'info');
+                } else {
+                    log('No saved progress found (first time user)', 'info');
+                }
+
+                if (notes) {
+                    const notesData = JSON.parse(notes);
+                    const count = Object.keys(notesData).length;
+                    log(`✓ Found ${count} saved notes`, 'info');
+                } else {
+                    log('No saved notes found', 'info');
+                }
+
+                // Cleanup
+                localStorage.removeItem('az104-test');
+            } catch (error) {
+                log(`✗ localStorage test failed: ${error.message}`, 'error');
+            }
+        }
+
+        function testProgressTracking() {
+            log('Testing progress tracking functions...', 'info');
+
+            try {
+                // Test topic key generation
+                const testKey = getTopicKey('section-1', 'Microsoft Entra ID Users and Groups');
+                log(`✓ Topic key: ${testKey}`, 'success');
+
+                // Test progress calculation
+                const sectionProgress = {
+                    'section-1-topic-1': true,
+                    'section-1-topic-2': false,
+                    'section-1-topic-3': true
+                };
+
+                const completed = Object.values(sectionProgress).filter(v => v).length;
+                const total = Object.keys(sectionProgress).length;
+                const percentage = Math.round((completed / total) * 100);
+
+                log(`✓ Progress calculation: ${completed}/${total} (${percentage}%)`, 'success');
+            } catch (error) {
+                log(`✗ Progress tracking test failed: ${error.message}`, 'error');
+            }
+        }
+
+        function getTopicKey(sectionId, topicTitle) {
+            return `${sectionId}-${topicTitle.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
+        }
+
+        function testMarkedLibrary() {
+            log('Testing Marked.js library...', 'info');
+
+            if (typeof marked === 'undefined') {
+                log('✗ Marked.js library not loaded!', 'error');
+                log('Loading from CDN...', 'info');
+
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+                script.onload = () => {
+                    log('✓ Marked.js loaded successfully', 'success');
+                    testMarkdownParsing();
+                };
+                script.onerror = () => {
+                    log('✗ Failed to load Marked.js from CDN', 'error');
+                };
+                document.head.appendChild(script);
+            } else {
+                log('✓ Marked.js already loaded', 'success');
+                testMarkdownParsing();
+            }
+        }
+
+        function testMarkdownParsing() {
+            try {
+                const testMarkdown = `
+## Test Heading
+This is a **bold** test with *italic* text.
+
+### Subheading
+- List item 1
+- List item 2
+
+\`\`\`bash
+echo "code block"
+\`\`\`
+                `;
+
+                const html = marked.parse(testMarkdown);
+                if (html && html.includes('<h2>')) {
+                    log('✓ Markdown parsing works correctly', 'success');
+                    log('Sample output length: ' + html.length + ' chars', 'info');
+                } else {
+                    log('✗ Markdown parsing returned unexpected result', 'error');
+                }
+            } catch (error) {
+                log(`✗ Markdown parsing failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Capture console errors
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            log(`JS Error: ${msg} at ${lineNo}:${columnNo}`, 'error');
+            return false;
+        };
+
+        log('Debug page loaded. Ready for testing!', 'success');
+    </script>
+</body>
+</html>

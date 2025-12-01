@@ -140,13 +140,16 @@ class StudyGuideApp {
 
     createTopicElement(sectionId, topic) {
         const topicDiv = document.createElement('div');
-        const topicKey = this.getTopicKey(sectionId, topic.title);
+        const topicKey = this.getTopicKey(sectionId, topic.subtitle || topic.title);
         const isCompleted = this.progress[topicKey] || false;
+
+        // Display subtitle if available, otherwise show title
+        const displayText = topic.subtitle || topic.title;
 
         topicDiv.className = `topic-item ${isCompleted ? 'completed' : ''}`;
         topicDiv.innerHTML = `
             <div class="topic-checkbox" data-topic-key="${topicKey}"></div>
-            <span>${topic.title}</span>
+            <span>${displayText}</span>
         `;
 
         // Make checkbox clickable to toggle completion
@@ -159,7 +162,8 @@ class StudyGuideApp {
             this.updateSidebarProgress();
 
             // Update the footer checkbox if this topic is currently loaded
-            if (this.currentSection === sectionId && this.currentTopic === topic.title) {
+            const topicIdentifier = topic.subtitle || topic.title;
+            if (this.currentSection === sectionId && this.currentTopic === topicIdentifier) {
                 document.getElementById('topic-complete-checkbox').checked = !currentState;
             }
         });
@@ -239,14 +243,15 @@ class StudyGuideApp {
     // Load Topic Content
     loadTopic(sectionId, topic, event) {
         this.currentSection = sectionId;
-        this.currentTopic = topic.title;
+        this.currentTopic = topic.subtitle || topic.title;
 
         const section = this.sections.find(s => s.id === sectionId);
-        const topicKey = this.getTopicKey(sectionId, topic.title);
+        const topicKey = this.getTopicKey(sectionId, topic.subtitle || topic.title);
 
         // Update breadcrumb
+        const topicDisplay = topic.subtitle || topic.title;
         document.getElementById('breadcrumb').textContent =
-            `${section.title} > ${topic.title}`;
+            `${section.title} > ${topicDisplay}`;
 
         // Render content
         const contentEl = document.getElementById('study-content');
@@ -287,7 +292,8 @@ class StudyGuideApp {
     getSectionProgress(sectionId, topics) {
         let completed = 0;
         topics.forEach(topic => {
-            const topicKey = this.getTopicKey(sectionId, topic.title);
+            const topicIdentifier = topic.subtitle || topic.title;
+            const topicKey = this.getTopicKey(sectionId, topicIdentifier);
             if (this.progress[topicKey]) {
                 completed++;
             }
@@ -320,12 +326,13 @@ class StudyGuideApp {
 
             // Update topic checkmarks
             topics.forEach(topic => {
-                const topicKey = this.getTopicKey(sectionId, topic.title);
+                const topicIdentifier = topic.subtitle || topic.title;
+                const topicKey = this.getTopicKey(sectionId, topicIdentifier);
                 const isCompleted = this.progress[topicKey] || false;
 
                 document.querySelectorAll('.topic-item').forEach(topicEl => {
                     const topicText = topicEl.querySelector('span').textContent;
-                    if (topicText === topic.title) {
+                    if (topicText === topicIdentifier) {
                         if (isCompleted) {
                             topicEl.classList.add('completed');
                         } else {
@@ -346,7 +353,8 @@ class StudyGuideApp {
             totalTopics += topics.length;
 
             topics.forEach(topic => {
-                const topicKey = this.getTopicKey(sectionId, topic.title);
+                const topicIdentifier = topic.subtitle || topic.title;
+                const topicKey = this.getTopicKey(sectionId, topicIdentifier);
                 if (this.progress[topicKey]) {
                     completedTopics++;
                 }
