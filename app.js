@@ -25,6 +25,11 @@ class StudyGuideApp {
     }
 
     setupEventListeners() {
+        // Main title click - return to welcome screen
+        document.getElementById('main-title').addEventListener('click', () => {
+            this.returnToWelcome();
+        });
+
         // Notes panel toggle
         document.getElementById('toggle-notes').addEventListener('click', () => {
             document.getElementById('notes-panel').classList.toggle('open');
@@ -388,6 +393,60 @@ class StudyGuideApp {
             btn.textContent = originalText;
             btn.style.backgroundColor = '';
         }, 2000);
+    }
+
+    // Return to Welcome Screen
+    returnToWelcome() {
+        // Clear current selection
+        this.currentSection = null;
+        this.currentTopic = null;
+
+        // Update breadcrumb
+        document.getElementById('breadcrumb').textContent = 'Select a section to begin';
+
+        // Show welcome screen
+        const contentEl = document.getElementById('study-content');
+        contentEl.innerHTML = `
+            <div class="welcome">
+                <h2>Welcome to AZ-104 Study Guide</h2>
+                <p>Select a section from the sidebar to start studying. Your progress will be automatically saved.</p>
+                <div class="features">
+                    <div class="feature">
+                        <span class="feature-icon">✓</span>
+                        <div>
+                            <h3>Track Progress</h3>
+                            <p>Mark sections and topics as completed</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">📝</span>
+                        <div>
+                            <h3>Take Notes</h3>
+                            <p>Add personal notes to any topic</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">📊</span>
+                        <div>
+                            <h3>Visual Dashboard</h3>
+                            <p>See your overall progress at a glance</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Hide topic footer
+        document.getElementById('topic-footer').style.display = 'none';
+
+        // Close notes panel
+        document.getElementById('notes-panel').classList.remove('open');
+
+        // Remove active state from all topics
+        document.querySelectorAll('.topic-item').forEach(el => el.classList.remove('active'));
+
+        // Scroll to top
+        contentEl.scrollTop = 0;
     }
 
     // Utility
