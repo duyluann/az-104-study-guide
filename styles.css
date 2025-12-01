@@ -224,7 +224,7 @@ body {
 }
 
 .section-title-text:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+    background: rgba(59, 130, 246, 0.1);
     transform: translateX(2px);
 }
 
@@ -560,21 +560,23 @@ body {
 }
 
 .study-content code {
-    background-color: var(--hover-bg);
+    background: rgba(59, 130, 246, 0.15);
     padding: 0.2rem 0.4rem;
     border-radius: 3px;
     font-family: 'Courier New', monospace;
     font-size: 0.875rem;
-    color: #e01e5a;
+    color: var(--primary-light);
+    border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
 .study-content pre {
-    background-color: var(--text-primary);
-    color: #f8f8f2;
+    background: rgba(13, 17, 23, 0.8);
+    color: #e6edf3;
     padding: 1rem;
     border-radius: 6px;
     overflow-x: auto;
     margin-bottom: 1rem;
+    border: 1px solid var(--border-color);
 }
 
 .study-content pre code {
