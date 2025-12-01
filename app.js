@@ -109,7 +109,7 @@ class StudyGuideApp {
         header.innerHTML = `
             <div class="section-title">
                 <span class="section-number">${number}</span>
-                <span>${section.title}</span>
+                <span class="section-title-text">${section.title}</span>
             </div>
             <div>
                 <span class="section-progress">${completed.completed}/${completed.total}</span>
@@ -126,8 +126,23 @@ class StudyGuideApp {
             topicList.appendChild(topicEl);
         });
 
-        // Toggle expansion
-        header.addEventListener('click', () => {
+        // Section title click - load section overview
+        const titleText = header.querySelector('.section-title-text');
+        titleText.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.loadSection(section.id);
+        });
+
+        // Expand icon click - toggle expansion
+        header.querySelector('.expand-icon').addEventListener('click', (e) => {
+            e.stopPropagation();
+            header.classList.toggle('expanded');
+            topicList.classList.toggle('expanded');
+        });
+
+        // Section progress click - toggle expansion
+        header.querySelector('.section-progress').addEventListener('click', (e) => {
+            e.stopPropagation();
             header.classList.toggle('expanded');
             topicList.classList.toggle('expanded');
         });
@@ -254,7 +269,7 @@ class StudyGuideApp {
         breadcrumb.innerHTML = `
             <span class="breadcrumb-link" id="breadcrumb-home">Home</span>
             <span class="breadcrumb-separator">›</span>
-            <span class="breadcrumb-section">${section.title}</span>
+            <span class="breadcrumb-link" id="breadcrumb-section">${section.title}</span>
             <span class="breadcrumb-separator">›</span>
             <span class="breadcrumb-current">${topicDisplay}</span>
         `;
@@ -262,6 +277,11 @@ class StudyGuideApp {
         // Make "Home" clickable
         document.getElementById('breadcrumb-home').addEventListener('click', () => {
             this.returnToWelcome();
+        });
+
+        // Make section name clickable
+        document.getElementById('breadcrumb-section').addEventListener('click', () => {
+            this.loadSection(sectionId);
         });
 
         // Render content
@@ -285,6 +305,54 @@ class StudyGuideApp {
 
         // Load notes
         this.loadTopicNotes(topicKey);
+
+        // Scroll to top
+        contentEl.scrollTop = 0;
+    }
+
+    // Load Section Overview
+    loadSection(sectionId) {
+        this.currentSection = sectionId;
+        this.currentTopic = null;
+
+        const section = this.sections.find(s => s.id === sectionId);
+        const sectionContent = this.sectionData[sectionId].content;
+
+        // Update breadcrumb with clickable home
+        const breadcrumb = document.getElementById('breadcrumb');
+        breadcrumb.innerHTML = `
+            <span class="breadcrumb-link" id="breadcrumb-home">Home</span>
+            <span class="breadcrumb-separator">›</span>
+            <span class="breadcrumb-current">${section.title}</span>
+        `;
+
+        // Make "Home" clickable
+        document.getElementById('breadcrumb-home').addEventListener('click', () => {
+            this.returnToWelcome();
+        });
+
+        // Render full section content
+        const contentEl = document.getElementById('study-content');
+        const html = marked.parse(sectionContent);
+        contentEl.innerHTML = html;
+
+        // Update active state - remove from topics, add to section
+        document.querySelectorAll('.topic-item').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.section-header').forEach(el => el.classList.remove('active-section'));
+
+        // Find and highlight the active section
+        const sectionHeaders = document.querySelectorAll('.section-header');
+        const sectionIndex = this.sections.findIndex(s => s.id === sectionId);
+        if (sectionHeaders[sectionIndex]) {
+            sectionHeaders[sectionIndex].classList.add('active-section');
+        }
+
+        // Hide topic footer (section pages don't have completion checkboxes)
+        const footer = document.getElementById('topic-footer');
+        footer.style.display = 'none';
+
+        // Close notes panel
+        document.getElementById('notes-panel').classList.remove('open');
 
         // Scroll to top
         contentEl.scrollTop = 0;
