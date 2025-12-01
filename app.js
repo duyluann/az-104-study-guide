@@ -248,10 +248,21 @@ class StudyGuideApp {
         const section = this.sections.find(s => s.id === sectionId);
         const topicKey = this.getTopicKey(sectionId, topic.subtitle || topic.title);
 
-        // Update breadcrumb
+        // Update breadcrumb with clickable navigation
         const topicDisplay = topic.subtitle || topic.title;
-        document.getElementById('breadcrumb').textContent =
-            `${section.title} > ${topicDisplay}`;
+        const breadcrumb = document.getElementById('breadcrumb');
+        breadcrumb.innerHTML = `
+            <span class="breadcrumb-link" id="breadcrumb-home">Home</span>
+            <span class="breadcrumb-separator">›</span>
+            <span class="breadcrumb-section">${section.title}</span>
+            <span class="breadcrumb-separator">›</span>
+            <span class="breadcrumb-current">${topicDisplay}</span>
+        `;
+
+        // Make "Home" clickable
+        document.getElementById('breadcrumb-home').addEventListener('click', () => {
+            this.returnToWelcome();
+        });
 
         // Render content
         const contentEl = document.getElementById('study-content');
@@ -410,7 +421,7 @@ class StudyGuideApp {
         this.currentTopic = null;
 
         // Update breadcrumb
-        document.getElementById('breadcrumb').textContent = 'Select a section to begin';
+        document.getElementById('breadcrumb').innerHTML = '<span class="breadcrumb-current">Select a section to begin</span>';
 
         // Show welcome screen
         const contentEl = document.getElementById('study-content');
