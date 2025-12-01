@@ -231,6 +231,13 @@ body {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.topic-checkbox:hover {
+    border-color: var(--success-color);
+    transform: scale(1.1);
 }
 
 .topic-item.completed .topic-checkbox {

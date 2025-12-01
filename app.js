@@ -140,10 +140,26 @@ class StudyGuideApp {
 
         topicDiv.className = `topic-item ${isCompleted ? 'completed' : ''}`;
         topicDiv.innerHTML = `
-            <div class="topic-checkbox"></div>
+            <div class="topic-checkbox" data-topic-key="${topicKey}"></div>
             <span>${topic.title}</span>
         `;
 
+        // Make checkbox clickable to toggle completion
+        const checkbox = topicDiv.querySelector('.topic-checkbox');
+        checkbox.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent loading the topic
+            const currentState = this.progress[topicKey] || false;
+            this.progress[topicKey] = !currentState;
+            this.saveProgress();
+            this.updateSidebarProgress();
+
+            // Update the footer checkbox if this topic is currently loaded
+            if (this.currentSection === sectionId && this.currentTopic === topic.title) {
+                document.getElementById('topic-complete-checkbox').checked = !currentState;
+            }
+        });
+
+        // Click on topic title/area loads the topic
         topicDiv.addEventListener('click', (e) => {
             this.loadTopic(sectionId, topic, e);
         });
