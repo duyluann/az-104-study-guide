@@ -14,7 +14,7 @@ class StudyGuideApp {
         this.sectionData = {};
         this.progress = this.loadProgress();
         this.notes = this.loadNotes();
-        this.hideCompleted = this.loadHideCompletedPreference();
+        this.sidebarCollapsed = this.loadSidebarState();
 
         this.init();
     }
@@ -31,11 +31,11 @@ class StudyGuideApp {
             this.returnToWelcome();
         });
 
-        // Hide completed toggle
-        document.getElementById('hide-completed-toggle').addEventListener('change', (e) => {
-            this.hideCompleted = e.target.checked;
-            this.saveHideCompletedPreference();
-            this.toggleCompletedVisibility();
+        // Sidebar toggle
+        document.getElementById('toggle-sidebar').addEventListener('click', () => {
+            this.sidebarCollapsed = !this.sidebarCollapsed;
+            this.saveSidebarState();
+            this.toggleSidebar();
         });
 
         // Notes panel toggle
@@ -60,12 +60,12 @@ class StudyGuideApp {
         });
     }
 
-    toggleCompletedVisibility() {
-        const nav = document.getElementById('section-nav');
-        if (this.hideCompleted) {
-            nav.classList.add('hide-completed');
+    toggleSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+        if (this.sidebarCollapsed) {
+            sidebar.classList.add('collapsed');
         } else {
-            nav.classList.remove('hide-completed');
+            sidebar.classList.remove('collapsed');
         }
     }
 
@@ -89,13 +89,13 @@ class StudyGuideApp {
         localStorage.setItem('az104-notes', JSON.stringify(this.notes));
     }
 
-    loadHideCompletedPreference() {
-        const saved = localStorage.getItem('az104-hide-completed');
+    loadSidebarState() {
+        const saved = localStorage.getItem('az104-sidebar-collapsed');
         return saved === 'true';
     }
 
-    saveHideCompletedPreference() {
-        localStorage.setItem('az104-hide-completed', this.hideCompleted.toString());
+    saveSidebarState() {
+        localStorage.setItem('az104-sidebar-collapsed', this.sidebarCollapsed.toString());
     }
 
     // Render Sidebar Navigation
@@ -121,12 +121,8 @@ class StudyGuideApp {
 
         this.updateProgressDashboard();
 
-        // Apply hide completed preference
-        const toggleCheckbox = document.getElementById('hide-completed-toggle');
-        if (toggleCheckbox) {
-            toggleCheckbox.checked = this.hideCompleted;
-            this.toggleCompletedVisibility();
-        }
+        // Apply saved sidebar state
+        this.toggleSidebar();
     }
 
     createSectionElement(section, topics, number) {

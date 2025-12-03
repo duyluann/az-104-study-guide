@@ -35,12 +35,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="sidebar-toggle">
-                    <label class="toggle-label">
-                        <input type="checkbox" id="hide-completed-toggle">
-                        <span class="toggle-text">Hide completed</span>
-                    </label>
-                </div>
             </div>
 
             <nav class="section-nav" id="section-nav">
@@ -51,7 +45,16 @@
         <!-- Main Content -->
         <main class="main-content">
             <div class="content-header">
-                <div class="breadcrumb" id="breadcrumb">Select a section to begin</div>
+                <div class="header-left">
+                    <button class="btn-icon" id="toggle-sidebar" title="Toggle Sidebar">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                    <div class="breadcrumb" id="breadcrumb">Select a section to begin</div>
+                </div>
                 <button class="btn-icon" id="toggle-notes" title="Toggle Notes Panel">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M12 20h9"></path>
