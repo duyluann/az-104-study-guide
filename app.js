@@ -14,6 +14,7 @@ class StudyGuideApp {
         this.sectionData = {};
         this.progress = this.loadProgress();
         this.notes = this.loadNotes();
+        this.hideCompleted = this.loadHideCompletedPreference();
 
         this.init();
     }
@@ -28,6 +29,13 @@ class StudyGuideApp {
         // Main title click - return to welcome screen
         document.getElementById('main-title').addEventListener('click', () => {
             this.returnToWelcome();
+        });
+
+        // Hide completed toggle
+        document.getElementById('hide-completed-toggle').addEventListener('change', (e) => {
+            this.hideCompleted = e.target.checked;
+            this.saveHideCompletedPreference();
+            this.toggleCompletedVisibility();
         });
 
         // Notes panel toggle
@@ -52,6 +60,15 @@ class StudyGuideApp {
         });
     }
 
+    toggleCompletedVisibility() {
+        const nav = document.getElementById('section-nav');
+        if (this.hideCompleted) {
+            nav.classList.add('hide-completed');
+        } else {
+            nav.classList.remove('hide-completed');
+        }
+    }
+
     // Local Storage Management
     loadProgress() {
         const saved = localStorage.getItem('az104-progress');
@@ -70,6 +87,15 @@ class StudyGuideApp {
 
     saveNotes() {
         localStorage.setItem('az104-notes', JSON.stringify(this.notes));
+    }
+
+    loadHideCompletedPreference() {
+        const saved = localStorage.getItem('az104-hide-completed');
+        return saved === 'true';
+    }
+
+    saveHideCompletedPreference() {
+        localStorage.setItem('az104-hide-completed', this.hideCompleted.toString());
     }
 
     // Render Sidebar Navigation
@@ -94,6 +120,13 @@ class StudyGuideApp {
         }
 
         this.updateProgressDashboard();
+
+        // Apply hide completed preference
+        const toggleCheckbox = document.getElementById('hide-completed-toggle');
+        if (toggleCheckbox) {
+            toggleCheckbox.checked = this.hideCompleted;
+            this.toggleCompletedVisibility();
+        }
     }
 
     createSectionElement(section, topics, number) {
@@ -366,6 +399,57 @@ class StudyGuideApp {
 
         // Update sidebar
         this.updateSidebarProgress();
+
+        // Auto-advance to next topic if marking as complete
+        if (completed) {
+            this.advanceToNextTopic(sectionId, topicTitle);
+        }
+    }
+
+    // Auto-advance to next topic
+    advanceToNextTopic(currentSectionId, currentTopicTitle) {
+        // Get all topics from all sections in order
+        const allTopics = [];
+
+        this.sections.forEach(section => {
+            const topics = this.sectionData[section.id]?.topics || [];
+            topics.forEach(topic => {
+                allTopics.push({
+                    sectionId: section.id,
+                    topic: topic
+                });
+            });
+        });
+
+        // Find current topic index
+        let currentIndex = -1;
+        for (let i = 0; i < allTopics.length; i++) {
+            const topicIdentifier = allTopics[i].topic.subtitle || allTopics[i].topic.title;
+            if (allTopics[i].sectionId === currentSectionId && topicIdentifier === currentTopicTitle) {
+                currentIndex = i;
+                break;
+            }
+        }
+
+        // Load next topic if available
+        if (currentIndex >= 0 && currentIndex < allTopics.length - 1) {
+            const nextTopic = allTopics[currentIndex + 1];
+
+            // Small delay for smooth transition
+            setTimeout(() => {
+                this.loadTopic(nextTopic.sectionId, nextTopic.topic, null);
+
+                // Update active state in sidebar
+                document.querySelectorAll('.topic-item').forEach(el => el.classList.remove('active'));
+                const nextTopicIdentifier = nextTopic.topic.subtitle || nextTopic.topic.title;
+                document.querySelectorAll('.topic-item').forEach(el => {
+                    const topicText = el.querySelector('span')?.textContent;
+                    if (topicText === nextTopicIdentifier) {
+                        el.classList.add('active');
+                    }
+                });
+            }, 500);
+        }
     }
 
     getSectionProgress(sectionId, topics) {
