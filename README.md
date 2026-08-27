@@ -16,10 +16,10 @@ This repository includes an interactive web application that makes studying easi
 ### Quick Start
 
 #### Option 1: GitHub Pages (Recommended)
-The app is deployed at: **https://duyluann.github.io/az-104-study-guide/**
+The app is deployed at: **https://ops4life.github.io/az-104-study-guide/**
 
 To enable GitHub Pages (if not already enabled):
-1. Go to your repository Settings at https://github.com/duyluann/az-104-study-guide/settings
+1. Go to your repository Settings at https://github.com/ops4life/az-104-study-guide/settings
 2. Navigate to "Pages" section in the left sidebar
 3. Under "Build and deployment", select "Deploy from a branch"
 4. Select the `main` branch and `/ (root)` folder
@@ -29,7 +29,7 @@ To enable GitHub Pages (if not already enabled):
 #### Option 2: Run Locally
 ```bash
 # Clone the repository
-git clone https://github.com/duyluann/az-104-study-guide.git
+git clone https://github.com/ops4life/az-104-study-guide.git
 cd az-104-study-guide
 
 # Start a local web server (Python 3)
